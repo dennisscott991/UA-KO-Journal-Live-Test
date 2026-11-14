@@ -33,10 +33,58 @@
 #liveBanner.success {color:#baffd5;border-color:#278251}
 #liveBanner.error {color:#ffd4d4;border-color:#a74b57}
 #userIdentity {color:#b9e9ff} #formPanel button:disabled {opacity:.45}
+
+/* v3.2 – responsivt KO-arbeidsområde, kompakt registrering og bred livelogg */
+.wrap{max-width:1900px;padding:16px 18px 70px}
+.ko-workspace{display:grid;grid-template-columns:minmax(315px,26%) minmax(0,1fr);gap:16px;align-items:start}
+.ko-workspace > *{min-width:0}
+.ko-workspace .panel{padding:15px;margin-bottom:12px}
+.ko-left #entryForm>.row:first-child{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ko-left #entryForm>.row:first-child .field{min-width:0}
+.ko-left #entryForm>.row:nth-child(2){display:grid;grid-template-columns:1fr;gap:10px}
+.ko-left #entryForm>.row:nth-child(2) .field{min-width:0}
+.ko-left #entryForm textarea{min-height:95px}
+.ko-left .task-status-options label{padding:7px 9px}
+.ko-left #typeChoices .type-group summary{padding:10px 12px}
+.ko-left #typeChoices .type-group[open] .type-items{padding:9px}
+.ko-left #managePanel .row{align-items:stretch}
+.ko-left #managePanel .field{flex-basis:100%}
+.ko-left #managePanel .field[style]{max-width:none!important;flex-basis:45%}
+.ko-left #managePanel button{flex:1}
+.ko-right{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+.ko-right .scroller{max-height:calc(100vh - 385px);min-height:240px;overflow:auto}
+.ko-right .scroller table{min-width:850px}
+.ko-right .scroller th{position:sticky;top:0;z-index:1}
+.ko-right #tasksPanel{order:2}
+.ko-right{display:flex;flex-direction:column}
+.ko-right .panel:has(#logRows){order:1}
+.ko-right #tasksPanel{order:2}
+.ko-right #tasksPanel .task-columns{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:1100px){
+ .ko-workspace{grid-template-columns:minmax(290px,34%) minmax(0,1fr)}
+ .ko-right .scroller table{min-width:760px}
+}
+@media(max-width:820px){
+ .ko-workspace{grid-template-columns:1fr}
+ .ko-right{position:static;max-height:none;overflow:visible}
+ .ko-right .scroller{max-height:60vh}
+ .ko-right #tasksPanel .task-columns{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+ .ko-left #entryForm>.row:nth-child(2){grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+ .ko-left #entryForm>.row:nth-child(2){grid-template-columns:1fr}
+ .ko-right .scroller{max-height:55vh}
+}
+@media print{
+ .ko-workspace{display:block}
+ .ko-right{position:static;max-height:none;overflow:visible;display:block}
+ .ko-right .scroller{max-height:none;overflow:visible}
+}
+
 </style>
 </head>
 <body>
-<header><h1>UNITY ARENA · KO JOURNAL</h1><p style="font-size:0.8rem;color:#9edaff">LIVE TESTVERSJON 3.0 · FELLES DATABASE · NYESTE ØVERST</p><p>Hendelser, sambandsmeldinger og arrangementsarkiv</p></header>
+<header><h1>UNITY ARENA · KO JOURNAL</h1><p style="font-size:0.8rem;color:#9edaff">LIVE TESTVERSJON 3.2 · FELLES DATABASE · NYESTE ØVERST</p><p>Hendelser, sambandsmeldinger og arrangementsarkiv</p></header>
 <main class="wrap">
 <div id="notice" role="status" aria-live="polite"></div><section class="panel" id="loginPanel"><h2>KO Live – innlogging <span id="connectionBadge">Ikke tilkoblet</span></h2>
 <p class="muted">Kun autoriserte operatører. Bruk testdata frem til løsningen er sikkerhetsgodkjent. Denne versjonen leser og lagrer i Supabase, ikke i nettleserarkivet.</p>
@@ -44,6 +92,8 @@
 <div class="row hidden" id="signedInPanel"><span id="userIdentity"></span><button id="logoutButton">Logg ut</button><button id="refreshButton">Oppdater nå</button></div></section>
 <div id="liveBanner" role="status">Kobler til Supabase …</div>
 
+<div class="ko-workspace">
+<aside class="ko-left" aria-label="Registrer og administrer journal">
 <section class="panel" id="managePanel"><h2>Arrangement</h2><div class="row"><div class="field"><label for="eventName">Artist / arrangementsnavn</label><input id="eventName" placeholder="F.eks. Artistnavn – Unity Arena"></div><div class="field" style="max-width:185px"><label for="eventDate">Dato</label><input id="eventDate" type="date"></div><button class="primary" id="createEvent">Opprett ny journal</button></div><p class="muted">Ny journal starter tom. Tidligere journaler blir værende i arkivet. Opprettelse endrer ikke eller sletter gamle loggføringer.</p></section>
 <section class="panel" id="formPanel"><h2>Registrer hendelse <span id="liveStatus" class="status"></span></h2><form id="entryForm"><div class="row"><div class="field"><label for="from">Fra / kallesignal</label><input id="from" placeholder="F.eks. Vakt 3" required></div><div class="field"><label for="to">Til / mottaker</label><input id="to" placeholder="F.eks. KO / Operativ leder"></div><div class="field"><label for="category">Kategori</label><select id="category" required><option>Samband</option><option>Orden og sikkerhet</option><option>Sanitet</option><option>Brann og evakuering</option><option>Show og produksjon</option><option>Publikum og adgang</option><option>Drift</option><option>Forespørsel / oppgave</option><option>Annet</option></select></div><div class="field"><label for="priority">Prioritet</label><select id="priority"><option value="Lav">Lav 🟢</option><option value="Middels">Middels 🟠</option><option value="Høy">Høy 🔴</option></select></div></div><div class="row" style="margin-top:13px"><div class="field"><label for="location">Sted / sone</label><input id="location" placeholder="F.eks. Inngang B"></div><div class="field"><label for="note">Melding / hendelsesbeskrivelse</label><textarea id="note" placeholder="Beskriv hendelsen og eventuelle tiltak" required></textarea></div></div><div class="row" style="margin-top:12px"><fieldset class="field task-field"><legend>Oppgavestatus – direkte valg (ikke nedtrekk)</legend><div id="taskStatusChoices" class="task-status-options">
 <label><input type="radio" name="taskStatus" value="" checked> Kun journalmelding</label>
@@ -52,8 +102,12 @@
 <label><input type="radio" name="taskStatus" value="Etterkontroll"> Etterkontroll</label>
 <label><input type="radio" name="taskStatus" value="Fullført"> Fullført</label>
 </div></fieldset></div><div style="margin-top:12px"><label>Hendelsestyper – åpne hovedkategori for å velge hendelsestyper</label><div id="typeChoices"></div><p class="muted">Forslag markeres mens du skriver. Kontrollér merkingen før registrering.</p></div><div class="auto-hint" id="autoHint" aria-live="polite">Kategori og prioritet foreslås automatisk mens du skriver. Du kan endre begge manuelt.</div><div class="row" style="margin-top:12px"><button class="primary" type="submit">Registrer med automatisk tidspunkt</button><span class="muted">Klokkeslett registreres når du trykker på knappen.</span></div></form></section>
+</aside>
+<div class="ko-right" aria-label="Livelogg og oppgaver">
 <section class="panel" id="tasksPanel"><h2>Oppgaver og forespørsler</h2><p class="muted">Velg «Forespørsel / oppgave» når du registrerer en melding. Åpne oppgaver flyttes automatisk mellom kolonnene når du endrer status. Fullførte oppgaver beholdes i historikken.</p><div id="taskSummary" class="totals"></div><div id="taskColumns" class="task-columns"></div></section>
 <section class="panel"><h2>Journal og rapporter</h2><div class="row no-print"><div class="field"><label for="filterCategory">Filtrer kategori</label><select id="filterCategory"><option value="">Alle kategorier</option></select></div><div class="field"><label for="search">Søk i journalen</label><input id="search" type="search" placeholder="Søk i navn, sted, melding ..."></div><div class="field"><label for="filterPriority">Filtrer prioritet</label><select id="filterPriority"><option value="">Alle prioriteter</option><option>Lav</option><option>Middels</option><option>Høy</option></select></div><button id="csvFiltered">Eksporter viste rader (CSV)</button><button id="csvAll">Eksporter hele journalen (CSV)</button><button id="print">Skriv ut / lag PDF</button></div><div id="summary" class="totals"></div><div class="scroller"><table><thead><tr><th>Tidspunkt</th><th>Fra</th><th>Til</th><th>Kategori</th><th>Prioritet</th><th>Sted</th><th>Melding / tiltak</th><th class="no-print">Handling</th></tr></thead><tbody id="logRows"></tbody></table></div></section>
+</div>
+</div>
 <section class="panel" id="reportPanel"><h2>Arrangementsrapport</h2><p class="muted">Rapporten bygger på registrerte hendelser og valgte hendelsestyper. Den er en regelbasert oppsummering, ikke en KI-vurdering. Kontroller alltid tall og formuleringer før deling.</p><div class="row no-print"><button class="primary" id="generateReport">Generer rapport</button><button id="printReport">Skriv ut rapport / lag PDF</button><button id="downloadReport">Last ned rapport (TXT)</button></div><div id="reportCounts"></div><label for="reportText">Oppsummering – kan redigeres før eksport</label><textarea id="reportText" placeholder="Trykk Generer rapport for å opprette oppsummeringen."></textarea></section>
 <section class="panel" id="archivePanel"><h2>Arrangementsarkiv</h2><p class="muted">Alle arrangementer du har tilgang til, vises her. Velg «Åpne» for å se en eldre journal.</p><div id="archiveList" class="archive-list"></div></section>
 
