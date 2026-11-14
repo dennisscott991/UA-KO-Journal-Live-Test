@@ -228,7 +228,7 @@ function toEntry(r){return {id:r.id,time:r.created_at,from:r.sender||'',to:r.rec
 function toEvent(r){return {id:r.id,name:r.name,date:r.event_date,created:r.created_at,closed:r.status==='archived',entries:[]}}
 function showAuth(){let on=!!currentUser;
 $('openGuestAdmin').classList.toggle('hidden',!on||currentRole!=='leader');
-if(!on||currentRole!=='leader'){$('guestAdminPanel').classList.add('hidden');}$('loginFields').classList.toggle('hidden',on);$('signedInPanel').classList.toggle('hidden',!on);$('userIdentity').textContent=on?`${currentUser.email} · ${currentRole==='leader'?'KO-leder':currentRole==='guest'?'Gjest':'Operatør'}`:'';$('connectionBadge').textContent=on?'Tilkoblet':'Logg inn';$('createEvent').disabled=!on||currentRole!=='leader';$('eventName').disabled=!on||currentRole!=='leader';$('eventDate').disabled=!on||currentRole!=='leader';render()}
+if(!on||currentRole!=='leader'){$('guestAdminPanel').classList.add('hidden');}$('loginFields').classList.toggle('hidden',on);$('signedInPanel').classList.toggle('hidden',!on);$('userIdentity').textContent=on?`${currentRole==='guest'?currentUser.email.split('@')[0]:currentUser.email} · ${currentRole==='leader'?'KO-leder':currentRole==='guest'?'Gjest':'Operatør'}`:'';$('connectionBadge').textContent=on?'Tilkoblet':'Logg inn';$('createEvent').disabled=!on||currentRole!=='leader';$('eventName').disabled=!on||currentRole!=='leader';$('eventDate').disabled=!on||currentRole!=='leader';render()}
 function rowsFiltered(){let e=active();if(!e)return [];let c=$('filterCategory').value,p=$('filterPriority').value,q=$('search').value.toLowerCase().trim();return e.entries.slice().sort((a,b)=>new Date(b.time)-new Date(a.time)||b.id.localeCompare(a.id)).filter(r=>(!c||r.category===c)&&(!p||r.priority===p)&&(!q||[r.from,r.to,r.category,r.priority,r.location,r.note,fmt(r.time)].join(' ').toLowerCase().includes(q)))}
 function render(){let e=active(),isLeader=!!currentUser&&currentRole==='leader';$('eventPicker').innerHTML=state.events.length?state.events.map(x=>`<option value="${esc(x.id)}" ${x.id===state.activeId?'selected':''}>${esc(x.name)} (${esc(x.date)}) ${x.closed?'[Avsluttet]':''}</option>`).join(''):'<option value="">Ingen arrangementer</option>';
 $('eventState').textContent=e?`Valgt: ${e.name} · ${e.date} · ${e.closed?'Arkivert':'Pågående'} · ${e.entries.length} registreringer`:'Logg inn og velg eller opprett et arrangement.';
@@ -355,8 +355,9 @@ $('guestCreateForm').addEventListener('submit',async ev=>{
  guestAdminBusy=true;$('guestCreateForm').querySelector('button[type="submit"]').disabled=true;
  try{
   await guestRequest({action:'create',username,password,arrangement_id:event});
+  guestMessage('Gjest '+username+' er opprettet. Kopier startpassordet fra dialogen og del det sikkert.');
+  prompt('Gjest opprettet. Kopier innloggingsdetaljene (vises bare nå):','Brukernavn: '+username+'\\nPassord: '+password);
   $('guestUsername').value='';$('guestPassword').value='';
-  guestMessage('Gjest '+username+' opprettet. Del brukernavn og startpassordet du nettopp valgte sikkert med gjesten.');
   await loadGuests();
  }catch(err){guestMessage('Kunne ikke opprette gjest: '+errorMessage(err),true)}
  finally{guestAdminBusy=false;$('guestCreateForm').querySelector('button[type="submit"]').disabled=false}
