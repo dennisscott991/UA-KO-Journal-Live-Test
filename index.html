@@ -147,6 +147,45 @@
 #journalPanel .ko-journal-table{min-width:700px}
 .ko-right .scroller table.ko-journal-table{min-width:700px}
 
+
+/* Mobilkort for KO-journal: iPhone 16 Pro (402 CSS px) og andre smale skjermer */
+@media screen and (max-width:600px){
+  #journalPanel .scroller, .ko-right .scroller{overflow-x:visible;max-height:none}
+  #journalPanel .ko-journal-table, .ko-right .scroller table.ko-journal-table{
+    display:block;width:100%;min-width:0;table-layout:auto
+  }
+  #journalPanel .ko-journal-table colgroup,
+  #journalPanel .ko-journal-table thead{display:none}
+  #journalPanel .ko-journal-table tbody{display:block;width:100%}
+  #journalPanel .ko-journal-table tbody tr{
+    display:block;width:100%;margin:0 0 12px;padding:8px 12px;
+    background:#122531;border:1px solid #456174;border-radius:10px
+  }
+  #journalPanel .ko-journal-table tbody td{
+    display:grid;grid-template-columns:85px minmax(0,1fr);align-items:start;
+    gap:10px;width:100%;min-width:0;padding:8px 0;font-size:.9rem;
+    border-bottom:1px solid #344a5c;overflow-wrap:anywhere
+  }
+  #journalPanel .ko-journal-table tbody td:last-child{border-bottom:0}
+  #journalPanel .ko-journal-table tbody td::before{font-size:.78rem;font-weight:700;color:#a9c7d9}
+  #journalPanel .ko-journal-table tbody td:nth-child(1)::before{content:"Tid"}
+  #journalPanel .ko-journal-table tbody td:nth-child(2)::before{content:"Av"}
+  #journalPanel .ko-journal-table tbody td:nth-child(3)::before{content:"Fra"}
+  #journalPanel .ko-journal-table tbody td:nth-child(4)::before{content:"Til"}
+  #journalPanel .ko-journal-table tbody td:nth-child(5)::before{content:"Kategori"}
+  #journalPanel .ko-journal-table tbody td:nth-child(6)::before{content:"Prioritet"}
+  #journalPanel .ko-journal-table tbody td:nth-child(7)::before{content:"Sted"}
+  #journalPanel .ko-journal-table tbody td:nth-child(8)::before{content:"Melding / tiltak"}
+  #journalPanel .ko-journal-table tbody td.note{white-space:pre-wrap}
+  #journalPanel .ko-journal-table tbody td[colspan]{display:block;text-align:center}
+  #journalPanel .ko-journal-table tbody td[colspan]::before{content:none}
+  #journalPanel .journal-export-actions{right:auto;left:0;max-width:100%}
+  #journalPanel button,.ko-left button,#guestAdminPanel button{min-height:44px}
+  #journalPanel input,#journalPanel select,.ko-left input,.ko-left select,.ko-left textarea{
+    font-size:16px;min-height:44px
+  }
+}
+
 </style>
 </head>
 <body>
