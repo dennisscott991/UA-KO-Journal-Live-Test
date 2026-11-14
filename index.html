@@ -114,16 +114,57 @@
 @media print{#journalPanel .ko-journal-table{min-width:0}#journalPanel .ko-journal-table th,#journalPanel .ko-journal-table td{font-size:9pt}#journalPanel .ko-journal-table .time-cell small{color:#444}}
 
 .entry-keyboard-hint{display:block;margin-top:5px;font-size:.75rem}
+
+/* v3.4 – administrasjon av gjestebrukere */
+#signedInPanel{align-items:center}
+#openGuestAdmin.hidden,#guestAdminPanel.hidden{display:none!important}
+#guestAdminPanel{border-color:#308ba0}
+.guest-admin-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.guest-admin-head h2,.guest-admin-head h3{margin:0}
+.guest-create-grid{display:grid;grid-template-columns:minmax(170px,1fr) minmax(240px,1.25fr) minmax(200px,1fr) auto;align-items:end;gap:12px;padding:14px;border:1px solid #39566a;border-radius:10px;background:#102330}
+.guest-create-grid>.field{min-width:0}
+.guest-password-row{display:flex;gap:6px}
+.guest-password-row input{min-width:0}
+.guest-password-row button{padding:8px;white-space:nowrap}
+#guestAdminNotice{margin:12px 0;color:#b5f1db;font-weight:650}
+#guestList{display:grid;gap:9px}
+.guest-row{border:1px solid #39566a;border-radius:9px;padding:12px;background:#102330}
+.guest-title{display:flex;justify-content:space-between;gap:9px;align-items:center;flex-wrap:wrap}
+.guest-title strong{font-size:1rem}
+.guest-tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.guest-tag{font-size:.8rem;padding:4px 7px;border-radius:6px;background:#25475b}
+.guest-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.guest-actions select{width:auto;max-width:310px;min-width:200px}
+.guest-actions button{font-size:.82rem;padding:8px 10px}
+.guest-disabled{opacity:.7}
+@media(max-width:1120px){.guest-create-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.guest-create-grid{grid-template-columns:1fr}.guest-actions select{width:100%;max-width:none}}
+
 </style>
 </head>
 <body>
-<header><h1>UNITY ARENA · KO JOURNAL</h1><p style="font-size:0.8rem;color:#9edaff">LIVE TESTVERSJON 3.3 · FELLES DATABASE · NYESTE ØVERST</p><p>Hendelser, sambandsmeldinger og arrangementsarkiv</p></header>
+<header><h1>UNITY ARENA · KO JOURNAL</h1><p style="font-size:0.8rem;color:#9edaff">LIVE TESTVERSJON 3.4 · FELLES DATABASE · NYESTE ØVERST</p><p>Hendelser, sambandsmeldinger og arrangementsarkiv</p></header>
 <main class="wrap">
 <div id="notice" role="status" aria-live="polite"></div><section class="panel" id="loginPanel"><h2>KO Live – innlogging <span id="connectionBadge">Ikke tilkoblet</span></h2>
 <p class="muted">Kun autoriserte operatører. Bruk testdata frem til løsningen er sikkerhetsgodkjent. Denne versjonen leser og lagrer i Supabase, ikke i nettleserarkivet.</p>
-<div class="row" id="loginFields"><div class="field"><label for="loginEmail">E-post</label><input type="email" id="loginEmail" autocomplete="username" placeholder="operatør@eksempel.no"></div><div class="field"><label for="loginPassword">Passord</label><input type="password" id="loginPassword" autocomplete="current-password" placeholder="Passord"></div><button class="primary" id="loginButton">Logg inn</button></div>
-<div class="row hidden" id="signedInPanel"><span id="userIdentity"></span><button id="logoutButton">Logg ut</button><button id="refreshButton">Oppdater nå</button></div></section>
+<div class="row" id="loginFields"><div class="field"><label for="loginEmail">E-post eller gjestebrukernavn</label><input type="text" id="loginEmail" autocomplete="username" placeholder="E-post / gjestebrukernavn"></div><div class="field"><label for="loginPassword">Passord</label><input type="password" id="loginPassword" autocomplete="current-password" placeholder="Passord"></div><button class="primary" id="loginButton">Logg inn</button></div>
+<div class="row hidden" id="signedInPanel"><span id="userIdentity"></span><button id="openGuestAdmin" type="button" class="primary hidden">Administrer brukere</button><button id="logoutButton">Logg ut</button><button id="refreshButton">Oppdater nå</button></div></section>
 <div id="liveBanner" role="status">Kobler til Supabase …</div>
+<section class="panel hidden no-print" id="guestAdminPanel" aria-label="Administrer gjestebrukere">
+<div class="guest-admin-head"><h2>Administrer brukere · KO-leder</h2><button id="closeGuestAdmin" type="button">Lukk</button></div>
+<p class="muted">Gjestene kan lese og registrere hendelser kun i tildelte, aktive arrangementer. De kan ikke endre, arkivere eller administrere journaler. Arkivering sperrer arrangementstilgangen automatisk.</p>
+<form id="guestCreateForm" class="guest-create-grid">
+<div class="field"><label for="guestUsername">Brukernavn</label><input id="guestUsername" maxlength="32" minlength="3" pattern="[a-zA-Z0-9][a-zA-Z0-9._-]{2,31}" autocomplete="off" placeholder="F.eks. scenevakt1" required></div>
+<div class="field"><label for="guestPassword">Startpassord (minst 12 tegn)</label><div class="guest-password-row"><input id="guestPassword" type="text" minlength="12" maxlength="128" autocomplete="off" spellcheck="false" required><button id="generateGuestPassword" type="button">Generer</button></div></div>
+<div class="field"><label for="guestArrangement">Tilgang til arrangement</label><select id="guestArrangement" required></select></div>
+<button class="primary" type="submit">Opprett gjest</button>
+</form>
+<p class="muted">Startpassordet vises her når du oppretter kontoen. Del det direkte med riktig person. Passord kan senere byttes av KO-leder.</p>
+<div id="guestAdminNotice" role="status" aria-live="polite"></div>
+<div class="guest-admin-head"><h3>Gjestekontoer</h3><button id="refreshGuests" type="button">Oppdater liste</button></div>
+<div id="guestList"><p class="muted">Åpne panelet for å hente gjestekontoer.</p></div>
+</section>
+
 
 <div class="ko-workspace">
 <aside class="ko-left" aria-label="Registrer og administrer journal">
@@ -185,7 +226,9 @@ function active(){return state.events.find(e=>e.id===state.activeId)||null}
 function typesOf(row){return Array.isArray(row.incident_types)?row.incident_types:[]}
 function toEntry(r){return {id:r.id,time:r.created_at,from:r.sender||'',to:r.receiver||'',location:r.location||'',note:r.description||'',category:r.category||'Samband',priority:r.priority||'Lav',types:typesOf(r),taskStatus:r.task_status==='Kun journalmelding'?'':(r.task_status||''),completedAt:null}}
 function toEvent(r){return {id:r.id,name:r.name,date:r.event_date,created:r.created_at,closed:r.status==='archived',entries:[]}}
-function showAuth(){let on=!!currentUser;$('loginFields').classList.toggle('hidden',on);$('signedInPanel').classList.toggle('hidden',!on);$('userIdentity').textContent=on?`${currentUser.email} · ${currentRole==='leader'?'KO-leder':'Operatør'}`:'';$('connectionBadge').textContent=on?'Tilkoblet':'Logg inn';$('createEvent').disabled=!on||currentRole!=='leader';$('eventName').disabled=!on||currentRole!=='leader';$('eventDate').disabled=!on||currentRole!=='leader';render()}
+function showAuth(){let on=!!currentUser;
+$('openGuestAdmin').classList.toggle('hidden',!on||currentRole!=='leader');
+if(!on||currentRole!=='leader'){$('guestAdminPanel').classList.add('hidden');}$('loginFields').classList.toggle('hidden',on);$('signedInPanel').classList.toggle('hidden',!on);$('userIdentity').textContent=on?`${currentUser.email} · ${currentRole==='leader'?'KO-leder':currentRole==='guest'?'Gjest':'Operatør'}`:'';$('connectionBadge').textContent=on?'Tilkoblet':'Logg inn';$('createEvent').disabled=!on||currentRole!=='leader';$('eventName').disabled=!on||currentRole!=='leader';$('eventDate').disabled=!on||currentRole!=='leader';render()}
 function rowsFiltered(){let e=active();if(!e)return [];let c=$('filterCategory').value,p=$('filterPriority').value,q=$('search').value.toLowerCase().trim();return e.entries.slice().sort((a,b)=>new Date(b.time)-new Date(a.time)||b.id.localeCompare(a.id)).filter(r=>(!c||r.category===c)&&(!p||r.priority===p)&&(!q||[r.from,r.to,r.category,r.priority,r.location,r.note,fmt(r.time)].join(' ').toLowerCase().includes(q)))}
 function render(){let e=active(),isLeader=!!currentUser&&currentRole==='leader';$('eventPicker').innerHTML=state.events.length?state.events.map(x=>`<option value="${esc(x.id)}" ${x.id===state.activeId?'selected':''}>${esc(x.name)} (${esc(x.date)}) ${x.closed?'[Avsluttet]':''}</option>`).join(''):'<option value="">Ingen arrangementer</option>';
 $('eventState').textContent=e?`Valgt: ${e.name} · ${e.date} · ${e.closed?'Arkivert':'Pågående'} · ${e.entries.length} registreringer`:'Logg inn og velg eller opprett et arrangement.';
@@ -243,10 +286,109 @@ function scheduleReload(){clearTimeout(reloadTimer);reloadTimer=setTimeout(fetch
 async function subscribe(){if(channel){await db.removeChannel(channel);channel=null}if(!currentUser)return;channel=db.channel('ko-live-journal').on('postgres_changes',{event:'*',schema:'public',table:'ko_entries'},scheduleReload).on('postgres_changes',{event:'*',schema:'public',table:'ko_arrangements'},scheduleReload).subscribe(s=>{if(s==='SUBSCRIBED')status('Live – sanntidsoppdatering tilkoblet.','success');else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT')status('Forbindelsen til liveoppdatering er brutt. Bruk «Oppdater nå».','error')})}
 async function initSession(){if(!db){status('Supabase-biblioteket kunne ikke lastes. Kontroller nettforbindelsen.','error');return}let {data:{session},error}=await db.auth.getSession();if(error)status(errorMessage(error),'error');await setSession(session)}
 async function setSession(session){currentUser=session?.user||null;currentRole=null;state={events:[],activeId:null};if(!currentUser){if(channel){await db.removeChannel(channel);channel=null}showAuth();status('Logg inn med en godkjent operatørkonto.');return}let role=await db.from('ko_operators').select('role').eq('user_id',currentUser.id).maybeSingle();if(role.error||!role.data){await db.auth.signOut();currentUser=null;showAuth();status('Brukeren har ikke tilgang som KO-operatør. Kontakt KO-leder.','error');return}currentRole=role.data.role;showAuth();await fetchAll();await subscribe()}
-$('loginButton').addEventListener('click',async()=>{let email=$('loginEmail').value.trim(),password=$('loginPassword').value;if(!email||!password)return notice('Skriv inn e-post og passord.');status('Logger inn …');let {data,error}=await db.auth.signInWithPassword({email,password});$('loginPassword').value='';if(error)return status('Innlogging feilet: '+errorMessage(error),'error');await setSession(data.session)});
+$('loginButton').addEventListener('click',async()=>{let email=$('loginEmail').value.trim(),password=$('loginPassword').value;
+if(email&&!email.includes('@'))email=email.toLowerCase()+'@guest.unityarena.example';if(!email||!password)return notice('Skriv inn e-post og passord.');status('Logger inn …');let {data,error}=await db.auth.signInWithPassword({email,password});$('loginPassword').value='';if(error)return status('Innlogging feilet: '+errorMessage(error),'error');await setSession(data.session)});
 $('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginButton').click()});
 $('logoutButton').addEventListener('click',async()=>{await db.auth.signOut();await setSession(null)});
 $('refreshButton').addEventListener('click',fetchAll);
+
+/* Gjestebrukere – serveren kontrollerer alltid KO-lederrollen og arrangementstilgangen. */
+let guestAdminData={guests:[],access:[],events:[]},guestAdminBusy=false;
+function guestMessage(text,isError=false){$('guestAdminNotice').textContent=text;$('guestAdminNotice').style.color=isError?'#ffd0d0':'#b5f1db'}
+function guestRandomPassword(){
+ const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#_-';
+ const nums=new Uint32Array(18);crypto.getRandomValues(nums);
+ return [...nums].map(n=>alphabet[n%alphabet.length]).join('');
+}
+async function guestRequest(body){
+ const {data,error}=await db.functions.invoke('ko-guest-admin',{body});
+ if(error){let message=error.message;try{const response=error.context;if(response?.json){const detail=await response.json();message=detail.error||message}}catch{}throw Error(message)}
+ if(data?.error)throw Error(data.error);
+ return data;
+}
+async function loadGuests(){
+ if(currentRole!=='leader'||!currentUser)return;
+ try{
+  guestAdminData=await guestRequest({action:'list'});
+  renderGuestAdmin();
+ }catch(err){guestMessage('Kunne ikke hente brukere: '+errorMessage(err),true)}
+}
+function renderGuestAdmin(){
+ const d=guestAdminData;
+ const available=(d.events||[]).filter(e=>e.status==='active');
+ const options=available.map(e=>'<option value="'+esc(e.id)+'">'+esc(e.name)+' · '+esc(e.event_date)+'</option>').join('');
+ $('guestArrangement').innerHTML=options||'<option value="">Ingen aktive arrangementer</option>';
+ $('guestCreateForm').querySelector('button[type="submit"]').disabled=!available.length||guestAdminBusy;
+ $('guestList').innerHTML=d.guests?.length?d.guests.map(g=>{
+  const grants=(d.access||[]).filter(a=>a.user_id===g.user_id&&a.active);
+  const tags=grants.map(a=>{
+   const event=d.events.find(e=>e.id===a.arrangement_id);
+   if(!event)return '';
+   return '<span class="guest-tag">'+esc(event.name)+' · '+(event.status==='active'?'Aktiv':'Arkivert')+
+    ' <button type="button" data-guest-action="revoke" data-user="'+esc(g.user_id)+'" data-event="'+esc(event.id)+'" aria-label="Fjern tilgang">×</button></span>';
+  }).join('');
+  return '<div class="guest-row '+(g.disabled_at?'guest-disabled':'')+'"><div class="guest-title"><strong>'+esc(g.username)+'</strong><span>'+
+   (g.disabled_at?'Deaktivert':'Aktiv konto')+'</span></div><div class="guest-tags">'+(tags||'<span class="muted">Ingen tildelte arrangementer</span>')+
+   '</div><div class="guest-actions"><select aria-label="Velg arrangement for '+esc(g.username)+'" data-guest-event="'+esc(g.user_id)+'">'+
+   '<option value="">Velg arrangement …</option>'+options+'</select>'+
+   '<button type="button" data-guest-action="assign" data-user="'+esc(g.user_id)+'">Gi tilgang</button>'+
+   '<button type="button" data-guest-action="reset_password" data-user="'+esc(g.user_id)+'">Nytt passord</button>'+
+   '<button type="button" data-guest-action="'+(g.disabled_at?'enable':'disable')+'" data-user="'+esc(g.user_id)+'">'+
+   (g.disabled_at?'Aktiver':'Deaktiver')+'</button></div></div>'
+ }).join(''):'<p class="muted">Ingen gjestebrukere opprettet.</p>';
+}
+$('openGuestAdmin').addEventListener('click',async()=>{
+ if(currentRole!=='leader')return;
+ $('guestAdminPanel').classList.toggle('hidden');
+ if(!$('guestAdminPanel').classList.contains('hidden')){guestMessage('');await loadGuests();$('guestAdminPanel').scrollIntoView({behavior:'smooth',block:'start'})}
+});
+$('closeGuestAdmin').addEventListener('click',()=>{$('guestAdminPanel').classList.add('hidden')});
+$('generateGuestPassword').addEventListener('click',()=>{$('guestPassword').value=guestRandomPassword()});
+$('refreshGuests').addEventListener('click',loadGuests);
+$('guestCreateForm').addEventListener('submit',async ev=>{
+ ev.preventDefault();
+ if(guestAdminBusy||currentRole!=='leader')return;
+ const username=$('guestUsername').value.trim().toLowerCase();
+ const password=$('guestPassword').value;
+ const event=$('guestArrangement').value;
+ if(!event)return guestMessage('Velg et aktivt arrangement.',true);
+ guestAdminBusy=true;$('guestCreateForm').querySelector('button[type="submit"]').disabled=true;
+ try{
+  await guestRequest({action:'create',username,password,arrangement_id:event});
+  $('guestUsername').value='';$('guestPassword').value='';
+  guestMessage('Gjest '+username+' opprettet. Del brukernavn og startpassordet du nettopp valgte sikkert med gjesten.');
+  await loadGuests();
+ }catch(err){guestMessage('Kunne ikke opprette gjest: '+errorMessage(err),true)}
+ finally{guestAdminBusy=false;$('guestCreateForm').querySelector('button[type="submit"]').disabled=false}
+});
+$('guestList').addEventListener('click',async ev=>{
+ const button=ev.target.closest('[data-guest-action]');
+ if(!button||guestAdminBusy||currentRole!=='leader')return;
+ const action=button.dataset.guestAction,user_id=button.dataset.user;
+ let arrangement_id=button.dataset.event||'';
+ let password;
+ if(action==='assign'){
+  arrangement_id=$('guestList').querySelector('select[data-guest-event="'+user_id+'"]')?.value||'';
+  if(!arrangement_id)return guestMessage('Velg et arrangement først.',true);
+ }
+ if(action==='reset_password'){
+  password=guestRandomPassword();
+  if(!confirm('Generere nytt passord for denne gjesten? Tidligere passord vil slutte å fungere.'))return;
+ }
+ if(action==='disable'&&!confirm('Deaktivere gjesten? Tilgangen til alle arrangementer sperres.'))return;
+ guestAdminBusy=true;button.disabled=true;
+ try{
+  await guestRequest({action,user_id,arrangement_id,password});
+  if(action==='reset_password'){
+   // Show once to KO-leder; never store credentials in journalen.
+   guestMessage('Nytt passord er generert. Kopier det fra dialogen som åpnes.');
+   prompt('Nytt passord (kopier og del sikkert):',password);
+  }else guestMessage('Gjestetilgangen ble oppdatert.');
+  await loadGuests();
+ }catch(err){guestMessage('Oppdateringen feilet: '+errorMessage(err),true)}
+ finally{guestAdminBusy=false;button.disabled=false}
+});
+
 $('eventDate').value=new Date().toLocaleDateString('sv-SE');$('filterCategory').innerHTML+=categories.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
 $('createEvent').addEventListener('click',async()=>{if(!currentUser||currentRole!=='leader')return;let name=$('eventName').value.trim(),date=$('eventDate').value;if(!name||!date)return notice('Skriv inn arrangementsnavn og dato.');let r=await db.from('ko_arrangements').insert({name,event_date:date,status:'active'}).select('id').single();if(r.error)return status('Kunne ikke opprette: '+errorMessage(r.error),'error');state.activeId=r.data.id;$('eventName').value='';await fetchAll();notice('Nytt arrangement opprettet.')});
 $('entryForm').addEventListener('submit',async ev=>{ev.preventDefault();let e=active();if(!e||e.closed||!currentUser||busy)return;let note=$('note').value.trim(),sender=$('from').value.trim();if(!note||!sender)return notice('Fyll ut fra og melding.');let row={arrangement_id:e.id,sender,receiver:$('to').value.trim(),location:$('location').value.trim(),description:note,category:$('category').value,priority:$('priority').value,incident_types:selectedTypes(),task_status:taskValue()||'Kun journalmelding',created_by:currentUser.id};busy=true;render();let out=await db.from('ko_entries').insert(row);busy=false;if(out.error)return status('Kunne ikke registrere: '+errorMessage(out.error),'error');$('note').value='';clearTypes();setTaskValue('');categoryManual=false;priorityManual=false;suggest();await fetchAll();$('note').focus();notice('Hendelsen er lagret i fellesjournalen.')});
